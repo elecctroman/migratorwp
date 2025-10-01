@@ -31,16 +31,7 @@ class Admin_Page {
     private $logger;
 
     /**
-     * Constructor.
-     *
-     * @param Exporter $exporter Exporter instance.
-     * @param Importer $importer Importer instance.
-     * @param Logger   $logger   Logger instance.
-     */
-    public function __construct( Exporter $exporter, Importer $importer, Logger $logger ) {
-        $this->exporter = $exporter;
-        $this->importer = $importer;
-        $this->logger   = $logger;
+
 
         add_action( 'admin_menu', [ $this, 'register_page' ] );
         add_action( 'admin_notices', [ $this, 'maybe_render_notice' ] );
@@ -74,6 +65,7 @@ class Admin_Page {
         }
 
         $logs = $this->logger->latest();
+
         ?>
         <div class="wrap migratorwp-admin">
             <h1><?php esc_html_e( 'MigratorWP - Profesyonel Site Taşıma', 'migratorwp' ); ?></h1>
@@ -111,6 +103,7 @@ class Admin_Page {
                     </form>
                 </div>
             </div>
+
 
             <h2><?php esc_html_e( 'Son İşlemler', 'migratorwp' ); ?></h2>
             <table class="widefat migratorwp-log">
@@ -153,6 +146,7 @@ class Admin_Page {
                 .migratorwp-log {
                     margin-top: 1.5rem;
                 }
+
             </style>
         </div>
         <?php

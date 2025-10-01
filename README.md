@@ -5,6 +5,7 @@ MigratorWP, büyük ölçekli WordPress sitelerini profesyonel şekilde taşıma
 ## Özellikler
 
 - ✅ **Tek paketli dışa aktarma** – Manifest, veritabanı ve tüm WordPress dosyalarını yüksek performanslı ZIP arşivine dönüştürür.
+
 - ✅ **Sınırsız boyut desteği** – Bellek artırma, zaman aşımı engelleme, parçalı SQL dökümleri ve akış tabanlı ZIP işlemleri ile devasa sitelerle uyumlu.
 - ✅ **Otomatik içe aktarma** – Yüklediğiniz paket arşivini açar, veritabanını çalıştırır ve dosyaları doğru konumlara kopyalar.
 - ✅ **WP-CLI desteği** – Sunucu tarafında terminal üzerinden dışa/içe aktarma komutları.
@@ -21,8 +22,7 @@ MigratorWP, büyük ölçekli WordPress sitelerini profesyonel şekilde taşıma
 ### Yönetim Paneli
 
 1. **MigratorWP → Dışa Aktar/İçe Aktar** sayfasını açın.
-2. Dışa aktarmak için *Dışa Aktarmayı Başlat* düğmesine tıklayın. Oluşturulan ZIP arşivi tarayıcınıza indirilir.
-3. Yeni sitede aynı sayfadan ZIP dosyasını yükleyip *İçe Aktarmayı Başlat* ile kurulumu tamamlayın.
+
 
 ### WP-CLI
 

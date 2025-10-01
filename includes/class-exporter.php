@@ -260,4 +260,5 @@ class Exporter {
             $zip->addFile( $path, 'files/' . $relative );
         }
     }
+
 }

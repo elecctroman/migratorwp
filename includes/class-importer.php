@@ -32,11 +32,7 @@ class Importer {
     /**
      * Import from uploaded file array.
      *
-     * @param array|null $file Uploaded file array.
-     *
-     * @return true|WP_Error
-     */
-    public function import_from_upload( $file ) {
+
         if ( empty( $file ) || ! empty( $file['error'] ) ) {
             return new WP_Error( 'migratorwp_import_upload', __( 'Geçersiz dosya yüklemesi.', 'migratorwp' ) );
         }
@@ -52,14 +48,7 @@ class Importer {
             return new WP_Error( 'migratorwp_import_upload', $uploaded['error'] );
         }
 
-        $path   = $uploaded['file'];
-        $result = $this->import( $path );
 
-        if ( is_wp_error( $result ) ) {
-            return $result;
-        }
-
-        return true;
     }
 
     /**
@@ -260,4 +249,5 @@ class Importer {
 
         @rmdir( $dir );
     }
+
 }
