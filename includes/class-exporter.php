@@ -261,41 +261,4 @@ class Exporter {
         }
     }
 
-    /**
-     * Execute export in background job context.
-     *
-     * @param Job_Manager $jobs   Job manager instance.
-     * @param string      $job_id Job identifier.
-     *
-     * @return void
-     */
-    public function run_job( Job_Manager $jobs, $job_id ) {
-        $job = $jobs->get( $job_id );
-        if ( ! $job || 'export' !== $job['type'] ) {
-            return;
-        }
-
-        ignore_user_abort( true );
-        if ( function_exists( '\\wp_raise_memory_limit' ) ) {
-            \wp_raise_memory_limit( 'admin' );
-        }
-        @set_time_limit( 0 );
-
-        $jobs->mark_running( $job_id, __( 'Dışa aktarma başlatıldı…', 'migratorwp' ) );
-
-        $path = $this->export();
-
-        if ( is_wp_error( $path ) ) {
-            $jobs->mark_error( $job_id, $path->get_error_message() );
-            return;
-        }
-
-        $result = [
-            'file'     => $path,
-            'filename' => basename( $path ),
-            'filesize' => file_exists( $path ) ? filesize( $path ) : 0,
-        ];
-
-        $jobs->mark_success( $job_id, $result, __( 'Dışa aktarma tamamlandı. Dosyayı indirebilirsiniz.', 'migratorwp' ) );
-    }
 }

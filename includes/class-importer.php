@@ -32,12 +32,7 @@ class Importer {
     /**
      * Import from uploaded file array.
      *
-     * @param array|null  $file Uploaded file array.
-     * @param Job_Manager $jobs Job manager instance.
-     *
-     * @return string|WP_Error Job identifier on success.
-     */
-    public function import_from_upload( $file, Job_Manager $jobs ) {
+
         if ( empty( $file ) || ! empty( $file['error'] ) ) {
             return new WP_Error( 'migratorwp_import_upload', __( 'Geçersiz dosya yüklemesi.', 'migratorwp' ) );
         }
@@ -53,15 +48,7 @@ class Importer {
             return new WP_Error( 'migratorwp_import_upload', $uploaded['error'] );
         }
 
-        $data = [
-            'package'       => $uploaded['file'],
-            'original_name' => isset( $file['name'] ) ? sanitize_file_name( $file['name'] ) : basename( $uploaded['file'] ),
-        ];
 
-        $job_id = $jobs->create( 'import', $data );
-        $jobs->progress( $job_id, 0, __( 'İçe aktarma kuyruğa alındı.', 'migratorwp' ) );
-
-        return $job_id;
     }
 
     /**
@@ -263,47 +250,4 @@ class Importer {
         @rmdir( $dir );
     }
 
-    /**
-     * Run import logic for background job.
-     *
-     * @param Job_Manager $jobs   Job manager instance.
-     * @param string      $job_id Job identifier.
-     *
-     * @return void
-     */
-    public function run_job( Job_Manager $jobs, $job_id ) {
-        $job = $jobs->get( $job_id );
-
-        if ( ! $job || 'import' !== $job['type'] ) {
-            return;
-        }
-
-        $package = isset( $job['data']['package'] ) ? $job['data']['package'] : '';
-
-        if ( empty( $package ) || ! file_exists( $package ) ) {
-            $jobs->mark_error( $job_id, __( 'İçe aktarma paketi bulunamadı.', 'migratorwp' ) );
-            return;
-        }
-
-        ignore_user_abort( true );
-        if ( function_exists( '\\wp_raise_memory_limit' ) ) {
-            \wp_raise_memory_limit( 'admin' );
-        }
-        @set_time_limit( 0 );
-
-        $jobs->mark_running( $job_id, __( 'İçe aktarma başlatıldı…', 'migratorwp' ) );
-
-        $result = $this->import( $package );
-
-        if ( is_wp_error( $result ) ) {
-            $jobs->mark_error( $job_id, $result->get_error_message() );
-            return;
-        }
-
-        $jobs->mark_success( $job_id, [], __( 'İçe aktarma tamamlandı.', 'migratorwp' ) );
-
-        if ( file_exists( $package ) ) {
-            @unlink( $package );
-        }
-    }
 }

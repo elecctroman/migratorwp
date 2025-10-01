@@ -31,25 +31,7 @@ class Admin_Page {
     private $logger;
 
     /**
-     * Job manager.
-     *
-     * @var Job_Manager
-     */
-    private $jobs;
 
-    /**
-     * Constructor.
-     *
-     * @param Exporter    $exporter Exporter instance.
-     * @param Importer    $importer Importer instance.
-     * @param Logger      $logger   Logger instance.
-     * @param Job_Manager $jobs     Job manager instance.
-     */
-    public function __construct( Exporter $exporter, Importer $importer, Logger $logger, Job_Manager $jobs ) {
-        $this->exporter = $exporter;
-        $this->importer = $importer;
-        $this->logger   = $logger;
-        $this->jobs     = $jobs;
 
         add_action( 'admin_menu', [ $this, 'register_page' ] );
         add_action( 'admin_notices', [ $this, 'maybe_render_notice' ] );
@@ -83,17 +65,7 @@ class Admin_Page {
         }
 
         $logs = $this->logger->latest();
-        $jobs = $this->jobs->all();
-        $status_labels = [
-            'pending' => __( 'Beklemede', 'migratorwp' ),
-            'running' => __( 'Çalışıyor', 'migratorwp' ),
-            'success' => __( 'Tamamlandı', 'migratorwp' ),
-            'error'   => __( 'Hata', 'migratorwp' ),
-        ];
-        $type_labels = [
-            'export' => __( 'Dışa Aktarma', 'migratorwp' ),
-            'import' => __( 'İçe Aktarma', 'migratorwp' ),
-        ];
+
         ?>
         <div class="wrap migratorwp-admin">
             <h1><?php esc_html_e( 'MigratorWP - Profesyonel Site Taşıma', 'migratorwp' ); ?></h1>
@@ -132,60 +104,6 @@ class Admin_Page {
                 </div>
             </div>
 
-            <h2><?php esc_html_e( 'İş Kuyruğu', 'migratorwp' ); ?></h2>
-            <p class="description"><?php esc_html_e( 'Uzun süren işlemler otomatik olarak arka planda yürütülür. Durumlarını buradan takip edebilirsiniz.', 'migratorwp' ); ?></p>
-            <table class="widefat migratorwp-jobs">
-                <thead>
-                    <tr>
-                        <th><?php esc_html_e( 'Başlangıç', 'migratorwp' ); ?></th>
-                        <th><?php esc_html_e( 'İşlem', 'migratorwp' ); ?></th>
-                        <th><?php esc_html_e( 'Durum', 'migratorwp' ); ?></th>
-                        <th><?php esc_html_e( 'Mesaj', 'migratorwp' ); ?></th>
-                        <th><?php esc_html_e( 'Güncelleme', 'migratorwp' ); ?></th>
-                        <th><?php esc_html_e( 'Aksiyon', 'migratorwp' ); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php if ( empty( $jobs ) ) : ?>
-                    <tr>
-                        <td colspan="6"><?php esc_html_e( 'Kuyrukta herhangi bir görev bulunmuyor.', 'migratorwp' ); ?></td>
-                    </tr>
-                <?php else : ?>
-                    <?php foreach ( $jobs as $job ) : ?>
-                        <?php
-                        $status = isset( $status_labels[ $job['status'] ] ) ? $status_labels[ $job['status'] ] : $job['status'];
-                        $type   = isset( $type_labels[ $job['type'] ] ) ? $type_labels[ $job['type'] ] : $job['type'];
-                        $message = ! empty( $job['message'] ) ? $job['message'] : __( 'Bekliyor…', 'migratorwp' );
-                        $progress = isset( $job['progress'] ) ? absint( $job['progress'] ) : 0;
-                        $actions = '&mdash;';
-
-                        if ( 'export' === $job['type'] && 'success' === $job['status'] && ! empty( $job['result']['file'] ) ) {
-                            $download_url = add_query_arg(
-                                [
-                                    'action' => 'migratorwp_download',
-                                    'job'    => rawurlencode( $job['id'] ),
-                                    'token'  => rawurlencode( $job['token'] ),
-                                ],
-                                admin_url( 'admin-post.php' )
-                            );
-
-                            $size = ! empty( $job['result']['filesize'] ) ? size_format( (int) $job['result']['filesize'] ) : '';
-                            $label = $size ? sprintf( __( 'İndir (%s)', 'migratorwp' ), $size ) : __( 'İndir', 'migratorwp' );
-                            $actions = sprintf( '<a class="button" href="%1$s">%2$s</a>', esc_url( $download_url ), esc_html( $label ) );
-                        }
-                        ?>
-                        <tr>
-                            <td><?php echo esc_html( $job['created_at'] ); ?></td>
-                            <td><?php echo esc_html( $type ); ?></td>
-                            <td><span class="migratorwp-status migratorwp-status--<?php echo esc_attr( $job['status'] ); ?>"><?php echo esc_html( $status ); ?></span><br><small><?php echo esc_html( $progress ); ?>%</small></td>
-                            <td><?php echo esc_html( $message ); ?></td>
-                            <td><?php echo esc_html( $job['updated_at'] ); ?></td>
-                            <td><?php echo $actions; // phpcs:ignore ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                </tbody>
-            </table>
 
             <h2><?php esc_html_e( 'Son İşlemler', 'migratorwp' ); ?></h2>
             <table class="widefat migratorwp-log">
@@ -228,31 +146,7 @@ class Admin_Page {
                 .migratorwp-log {
                     margin-top: 1.5rem;
                 }
-                .migratorwp-jobs {
-                    margin-top: 1rem;
-                }
-                .migratorwp-status {
-                    display: inline-block;
-                    padding: 0.2em 0.6em;
-                    border-radius: 999px;
-                    font-weight: 600;
-                }
-                .migratorwp-status--pending {
-                    background: #fef3c7;
-                    color: #92400e;
-                }
-                .migratorwp-status--running {
-                    background: #dbeafe;
-                    color: #1d4ed8;
-                }
-                .migratorwp-status--success {
-                    background: #dcfce7;
-                    color: #166534;
-                }
-                .migratorwp-status--error {
-                    background: #fee2e2;
-                    color: #991b1b;
-                }
+
             </style>
         </div>
         <?php

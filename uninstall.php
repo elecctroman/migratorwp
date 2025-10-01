@@ -7,4 +7,4 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 delete_option( \MigratorWP\Logger::OPTION_KEY );
-delete_option( \MigratorWP\Job_Manager::OPTION_KEY );
+
